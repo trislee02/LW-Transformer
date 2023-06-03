@@ -59,7 +59,11 @@ _C.SOLVER.OPTIMIZER_NAME = "Adam"
 _C.SOLVER.MAX_EPOCHS = 100
 # Base learning rate
 _C.SOLVER.BASE_LR = 3e-4
-
+_C.SOLVER.SEED = 1
+# Number of images per batch
+# This is global, so if we have 8 GPUs and IMS_PER_BATCH = 128, each GPU will
+# contain 16 images per batch
+_C.SOLVER.IMS_PER_BATCH = 64
 # ---------------------------------------------------------------------------- #
 # TEST
 # ---------------------------------------------------------------------------- #

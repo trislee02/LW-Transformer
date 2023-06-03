@@ -36,10 +36,7 @@ def main(config):
 
     train_loader, test_loader = make_dataloader(config)
 
-    for batch_idx, samples in enumerate(train_loader):
-        print(batch_idx, samples)
-
-    # model = make_model(config)
+    model = make_model(config)
 
     # loss_function = make_loss(config)
 

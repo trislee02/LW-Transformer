@@ -9,26 +9,28 @@ __factory = {
 }
 
 def make_dataloader(config):
-    train_transform = T.compose([
-        T.Resize(config.INPUT.TRAIN_SIZE, interpolation=3),
+    train_transform = T.Compose([
+        T.Resize(config.INPUT.SIZE_TRAIN, interpolation=3),
         T.RandomHorizontalFlip(),
         T.ToTensor(),
         T.Normalize(mean=config.INPUT.PIXEL_MEAN, std=config.INPUT.PIXEL_STD)
     ])
 
-    val_transform = T.compose([
-        T.Resize(config.INPUT.TRAIN_SIZE, interpolation=3),
+    val_transform = T.Compose([
+        T.Resize(config.INPUT.SIZE_TRAIN, interpolation=3),
         T.ToTensor(),
         T.Normalize(mean=config.INPUT.PIXEL_MEAN, std=config.INPUT.PIXEL_STD)
     ])
+
+    num_workers = config.DATALOADER.NUM_WORKERS
 
     dataset = __factory[config.DATASETS.NAMES](root = config.DATASETS.ROOT_DIR)
 
     train_set = ImageDataset(dataset.train, train_transform)
     val_set = ImageDataset(dataset.query, val_transform)
 
-    train_loader = DataLoader(train_set, batch_size=config.SOLVER.IMS_PER_BATCH, shuffle=True)
-    val_loader = DataLoader(val_set, batch_size=config.SOLVER.IMS_PER_BATCH, shuffle=True)
+    train_loader = DataLoader(train_set, batch_size=config.SOLVER.IMS_PER_BATCH, shuffle=True, num_workers=num_workers)
+    val_loader = DataLoader(val_set, batch_size=config.SOLVER.IMS_PER_BATCH, shuffle=True, num_workers=num_workers)
 
     return train_loader, val_loader
 
