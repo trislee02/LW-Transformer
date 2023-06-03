@@ -1,0 +1,28 @@
+MODEL:
+  NAME: transformer
+  DEVICE_ID: ('0')
+  DEVICE: 'cuda'
+  PRETRAIN_PATH: ./pretrain/abc.ptk
+
+INPUT:
+  SIZE_TRAIN: [256, 128]
+  SIZE_TEST: [256, 128]
+
+DATASETS:
+  NAMES: market1501
+  ROOT_DIR: ../../data
+
+DATALOADER:
+  SAMPLER: softmax_triplet
+  NUM_INSTANCE: 4
+  NUM_WORKERS: 8
+
+SOLVER:
+  OPTIMIZER_NAME: 'SGD'
+  MAX_EPOCHS: 120
+  BASE_LR: 0.008
+
+TEST:
+  IMS_PER_BATCH: 256
+
+OUTPUT_DIR: '../logs/0321_market_vit_base'
