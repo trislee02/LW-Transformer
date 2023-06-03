@@ -36,13 +36,16 @@ def main(config):
 
     train_loader, test_loader = make_dataloader(config)
 
-    model = make_model(config)
+    for batch_idx, samples in enumerate(train_loader):
+        print(batch_idx, samples)
 
-    loss_function = make_loss(config)
+    # model = make_model(config)
 
-    optimizer = make_optimizer(config)
+    # loss_function = make_loss(config)
 
-    scheduler = make_scheduler(config)
+    # optimizer = make_optimizer(config)
+
+    # scheduler = make_scheduler(config)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='LW-Transformer')
