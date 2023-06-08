@@ -48,8 +48,8 @@ def main(config):
     train_one_epoch(model, 
                     train_dataloader=train_loader,
                     loss_fn=loss_function,
-                    optimizer=optimizer
-                    )
+                    optimizer=optimizer,
+                    device=config.MODEL.DEVICE)
                     
     # scheduler = make_scheduler(config)
 
