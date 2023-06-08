@@ -32,5 +32,6 @@ def make_dataloader(config):
     train_loader = DataLoader(train_set, batch_size=config.SOLVER.IMS_PER_BATCH, shuffle=True, num_workers=num_workers)
     val_loader = DataLoader(val_set, batch_size=config.SOLVER.IMS_PER_BATCH, shuffle=True, num_workers=num_workers)
 
-    return train_loader, val_loader
+    train_num_classes = dataset.train_num_classes
+    return train_loader, val_loader, train_num_classes
 

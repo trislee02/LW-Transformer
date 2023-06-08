@@ -55,10 +55,10 @@ class LWTransformer(nn.Module):
         else:
             return feature
 
-def make_model(config):
+def make_model(config, num_classes):
     base_model = timm.create_model(config.MODEL.BASE_MODEL, pretrained=True)
     base_model = base_model.to(config.MODEL.DEVICE)
     base_model.eval()
     
-    return LWTransformer(base_model, num_classes=config.MODEL.TRAINING_NUM_CLASSES)
+    return LWTransformer(base_model, num_classes=num_classes)
 

@@ -19,6 +19,8 @@ class Market1501(BaseImageDataset):
           print("Train set: {} images".format(len(self.train)))
           print("Query set: {} images".format(len(self.query)))
           print("Gallery set: {} images".format(len(self.gallery)))
+          
+        self.train_num_classes = self.get_num_classes(self.train)
 
     def __process_dir(self, dir):
         img_paths = glob.glob(os.path.join(dir, '*.jpg'))

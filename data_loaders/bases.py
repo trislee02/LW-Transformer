@@ -5,8 +5,15 @@ class BaseImageDataset:
     def __init__(self):
         pass
 
-    def statistic(self):
-        pass
+    def get_num_classes(self, dataset):
+        labels = []
+        for path, label in dataset:
+            labels += [label]
+
+        labels = set(labels)
+        num_classes = len(labels)
+
+        return num_classes
 
 class ImageDataset(Dataset):
     def __init__(self, dataset, transform=None):

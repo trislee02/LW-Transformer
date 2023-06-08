@@ -11,6 +11,8 @@ from loss import make_loss
 from optimizers import make_optimizer
 from schedulers import make_scheduler
 
+# Debug only
+from processor import train_one_epoch
 
 def set_seed(seed):
     torch.manual_seed(seed)
@@ -35,14 +37,20 @@ def main(config):
 
     os.environ['CUDA_VISIBLE_DEVICES'] = config.MODEL.DEVICE_ID
 
-    train_loader, test_loader = make_dataloader(config)
+    train_loader, test_loader, num_classes = make_dataloader(config)
 
-    model = make_model(config)
+    model = make_model(config, num_classes)
 
     loss_function = make_loss(config)
 
     optimizer = make_optimizer(config, model)
 
+    train_one_epoch(model, 
+                    train_dataloader=train_loader,
+                    loss_fn=loss_function,
+                    optimizer=optimizer
+                    )
+                    
     # scheduler = make_scheduler(config)
 
 if __name__ == '__main__':
