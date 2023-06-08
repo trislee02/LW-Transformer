@@ -17,6 +17,8 @@ _C.MODEL.DEVICE_ID = '0'
 _C.MODEL.NAME = 'resnet50'
 # Path to pretrained model of backbone
 _C.MODEL.PRETRAIN_PATH = ''
+# Base transformer model
+_C.MODEL.BASE_MODEL = 'vit_base_patch16_224'
 
 # -----------------------------------------------------------------------------
 # INPUT
@@ -37,6 +39,8 @@ _C.DATASETS = CN()
 _C.DATASETS.NAMES = ('market1501')
 # Root directory where datasets should be used (and downloaded if not found)
 _C.DATASETS.ROOT_DIR = ('../data')
+# Number of classes for training
+_C.DATASETS.TRAINING_NUM_CLASSES = 751
 
 # -----------------------------------------------------------------------------
 # DataLoader
@@ -60,6 +64,8 @@ _C.SOLVER.MAX_EPOCHS = 100
 # Base learning rate
 _C.SOLVER.BASE_LR = 3e-4
 _C.SOLVER.SEED = 1
+_C.SOLVER.WEIGHT_DECAY = 5e-4
+
 # Number of images per batch
 # This is global, so if we have 8 GPUs and IMS_PER_BATCH = 128, each GPU will
 # contain 16 images per batch

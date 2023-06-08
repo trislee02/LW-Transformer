@@ -11,6 +11,7 @@ from loss import make_loss
 from optimizers import make_optimizer
 from schedulers import make_scheduler
 
+
 def set_seed(seed):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
@@ -38,9 +39,9 @@ def main(config):
 
     model = make_model(config)
 
-    # loss_function = make_loss(config)
+    loss_function = make_loss(config)
 
-    # optimizer = make_optimizer(config)
+    optimizer = make_optimizer(config, model)
 
     # scheduler = make_scheduler(config)
 

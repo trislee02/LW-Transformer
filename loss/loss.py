@@ -1,2 +1,4 @@
+from torch import nn
+
 def make_loss(config):
-    pass
+    return nn.CrossEntropyLoss()
