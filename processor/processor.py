@@ -1,7 +1,6 @@
 import torch
 import os
 from tqdm import tqdm
-from ..utils.network import save_network
 
 def train_one_epoch(model, train_dataloader, loss_fn, optimizer, device='cuda'):
     # Training
@@ -68,6 +67,11 @@ def validate(model, val_dataloader, loss_fn, device='cuda'):
 
     return val_loss, val_acc
 
+def save_network(model, path, device='cpu'):
+    model.cpu()
+    torch.save(model, path)
+    model.to(device)    
+
 def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer):
     num_epochs = config.SOLVER.MAX_EPOCHS
     device = config.MODEL.DEVICE
@@ -76,12 +80,13 @@ def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer
     for epoch in range(num_epochs):
         print(f"\nEpoch {epoch}: ========================")
 
-        # train_one_epoch(model, train_dataloader, loss_fn, optimizer, device=device)
+        train_one_epoch(model, train_dataloader, loss_fn, optimizer, device=device)
 
         val_loss, val_acc = validate(model, val_dataloader, loss_fn, device=device)
 
         if val_acc > best_acc:
             save_path = os.path.join(config.OUTPUT_DIR, config.MODEL.NAME + '_{}.pth'.format(epoch))
             save_network(model, save_path, config.MODEL.DEVICE)
+            print(f"Saved model at {save_path}")
 
         

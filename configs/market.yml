@@ -26,4 +26,4 @@ SOLVER:
 TEST:
   IMS_PER_BATCH: 256
 
-OUTPUT_DIR: '../logs/0321_market_vit_base'
+OUTPUT_DIR: '/content/drive/MyDrive/saved_weights'
