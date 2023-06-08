@@ -19,7 +19,7 @@ class ClassifierBlock(nn.Module):
         return self.classifier(x)
 
 class LWTransformer(nn.Module):
-    def __init__(self, base_model, num_classes):
+    def __init__(self, base_model, num_classes, feature_only=True):
         super().__init__()
         self.num_classes = num_classes
         self.base_model = base_model
@@ -27,7 +27,8 @@ class LWTransformer(nn.Module):
         self.num_blocks = 12
         self.linear = nn.Linear(in_features=768, out_features=768)
         self.classifier = ClassifierBlock(input_size=1536, hidden_size=1536, num_classes=num_classes) # 768 + 768 = 1536 (= concat aggregated token and global token)
-        
+        self.feature_only = feature_only
+
     def forward(self, x):
         # Divide input image into patch embeddings 
         x = self.base_model.patch_embed(x) # -> shape = (B, 196 embeddings, 768 embed-dim) 
@@ -49,16 +50,16 @@ class LWTransformer(nn.Module):
         aggregated_token = torch.sum(local_tokens, dim=1)
         feature = torch.cat((aggregated_token, cls_token_out), dim=1)
         
-        if self.training:
+        if not self.feature_only:
             x = self.classifier(feature)
             return feature, x
         else:
             return feature
 
-def make_model(config, num_classes):
+def make_model(config, num_classes, feature_only=True):
     base_model = timm.create_model(config.MODEL.BASE_MODEL, pretrained=True)
     base_model = base_model.to(config.MODEL.DEVICE)
     base_model.eval()
     
-    return LWTransformer(base_model, num_classes=num_classes)
+    return LWTransformer(base_model, num_classes=num_classes, feature_only=feature_only)
 

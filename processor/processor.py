@@ -1,5 +1,7 @@
 import torch
+import os
 from tqdm import tqdm
+from ..utils.network import save_network
 
 def train_one_epoch(model, train_dataloader, loss_fn, optimizer, device='cuda'):
     # Training
@@ -59,19 +61,27 @@ def validate(model, val_dataloader, loss_fn, device='cuda'):
             acc = torch.eq(preds, target).sum().item() / len(target)
             val_acc += acc
 
-    val_loss /= len(val_dataloader)
-    val_acc /= len(val_dataloader)
+        val_loss /= len(val_dataloader)
+        val_acc /= len(val_dataloader)
 
     print(f"\nVal loss: {val_loss:.5f} - Val acc: {val_acc:.5f}")
+
+    return val_loss, val_acc
 
 def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer):
     num_epochs = config.SOLVER.MAX_EPOCHS
     device = config.MODEL.DEVICE
+    best_acc = 0.0
     
     for epoch in range(num_epochs):
         print(f"\nEpoch {epoch}: ========================")
 
-        train_one_epoch(model, train_dataloader, val_dataloader, loss_fn, optimizer, device=device)
+        # train_one_epoch(model, train_dataloader, loss_fn, optimizer, device=device)
 
-        validate(model, val_dataloader, loss_fn, device=device)
-        break
+        val_loss, val_acc = validate(model, val_dataloader, loss_fn, device=device)
+
+        if val_acc > best_acc:
+            save_path = os.path.join(config.OUTPUT_DIR, config.MODEL.NAME + '_{}.pth'.format(epoch))
+            save_network(model, save_path, config.MODEL.DEVICE)
+
+        

@@ -39,7 +39,7 @@ def main(config):
 
     train_loader, val_loader, num_classes = make_dataloader(config)
 
-    model = make_model(config, num_classes)
+    model = make_model(config, num_classes, feature_only=False)
 
     loss_function = make_loss(config)
 
