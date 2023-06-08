@@ -27,7 +27,7 @@ def make_dataloader(config):
     dataset = __factory[config.DATASETS.NAMES](root = config.DATASETS.ROOT_DIR)
 
     train_set = ImageDataset(dataset.train, train_transform)
-    val_set = ImageDataset(dataset.query, val_transform)
+    val_set = ImageDataset(dataset.val, val_transform)
 
     train_loader = DataLoader(train_set, batch_size=config.SOLVER.IMS_PER_BATCH, shuffle=True, num_workers=num_workers)
     val_loader = DataLoader(val_set, batch_size=config.SOLVER.IMS_PER_BATCH, shuffle=True, num_workers=num_workers)

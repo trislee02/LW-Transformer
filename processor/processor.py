@@ -32,18 +32,46 @@ def train_one_epoch(model, train_dataloader, loss_fn, optimizer, device='cuda'):
         acc = torch.eq(preds, target).sum().item() / len(target)
         epoch_acc += acc
 
-        break
-
     epoch_loss /= len(train_dataloader)
     epoch_acc /= len(train_dataloader)
     
     print(f"\nTrain loss: {epoch_loss:.5f} - Train acc: {epoch_acc:.5f}")
 
+def validate(model, val_dataloader, loss_fn, device='cuda'):
+    model.eval()
+    model.to(device)
+    val_loss = 0.0
+    val_acc = 0.0
+
+    with torch.inference_mode():
+        for data, target in tqdm(val_dataloader):
+            data, target = data.to(device), target.to(device)
+
+            # 1. Forward pass
+            feature, preds = model(data)
+
+            # 2. Calculate loss
+            loss = loss_fn(preds, target)
+            val_loss += loss
+
+            # 3. Calculate accuracy
+            preds = torch.argmax(preds, dim=1)
+            acc = torch.eq(preds, target).sum().item() / len(target)
+            val_acc += acc
+
+    val_loss /= len(val_dataloader)
+    val_acc /= len(val_dataloader)
+
+    print(f"\nVal loss: {val_loss:.5f} - Val acc: {val_acc:.5f}")
+
 def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer):
     num_epochs = config.SOLVER.MAX_EPOCHS
     device = config.MODEL.DEVICE
     
-    model.to(device)
-
     for epoch in range(num_epochs):
-        train_one_epoch(config, model, train_dataloader, val_dataloader, loss_fn, optimizer, device=device)
+        print(f"\nEpoch {epoch}: ========================")
+
+        train_one_epoch(model, train_dataloader, val_dataloader, loss_fn, optimizer, device=device)
+
+        validate(model, val_dataloader, loss_fn, device=device)
+        break

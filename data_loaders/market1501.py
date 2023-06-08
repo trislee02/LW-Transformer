@@ -1,5 +1,7 @@
 import os.path
 import glob
+import torch
+from torch.utils.data import random_split
 from .bases import BaseImageDataset
 
 class Market1501(BaseImageDataset):
@@ -15,8 +17,14 @@ class Market1501(BaseImageDataset):
         self.query, self.query_labels, self.query_num_classes = self.__process_dir(self.query_dir)
         self.gallery, self.gallery_labels, self.gallery_num_classes = self.__process_dir(self.gallery_dir)
 
+        generator2 = torch.Generator().manual_seed(42)
+        data = random_split(self.train, [0.7, 0.3], generator=generator2)
+        self.train = data[0]
+        self.val = data[1]
+
         if verbose:
           print("Train set: {} images".format(len(self.train)))
+          print("Val set: {} images".format(len(self.val)))
           print("Query set: {} images".format(len(self.query)))
           print("Gallery set: {} images".format(len(self.gallery)))
           
