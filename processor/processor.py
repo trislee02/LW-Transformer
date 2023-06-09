@@ -72,12 +72,31 @@ def save_network(model, path, device='cpu'):
     torch.save(model, path)
     model.to(device)    
 
+def freeze_all_block(model):
+    for block in model.base_model.blocks:
+        for param in block.parameters():
+            param.requires_grad = False
+
+def unfreeze_blocks(model, num_blocks):
+    block_from = model.num_blocks - num_blocks
+    for block in model.base_model.blocks[block_from:]:
+        for param in block.parameters():
+            param.requires_grad = True
+
 def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer):
     num_epochs = config.SOLVER.MAX_EPOCHS
     device = config.MODEL.DEVICE
     best_acc = 0.0
     
+    num_unfrozen_blocks = 0
+    freeze_all_block(model)
+
     for epoch in range(num_epochs):
+        if epoch % config.SOLVER.UNFREEZE_BLOCKS == 0:
+            unfreeze_blocks(model, num_unfrozen_blocks)
+            trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+            print("Unfrozen Blocks: {}, Trainable Params: {}".format(num_unfrozen_blocks, trainable_params))
+
         print(f"\nEpoch {epoch}: ========================")
 
         train_one_epoch(model, train_dataloader, loss_fn, optimizer, device=device)
@@ -85,7 +104,8 @@ def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer
         val_loss, val_acc = validate(model, val_dataloader, loss_fn, device=device)
 
         if val_acc > best_acc:
-            save_path = os.path.join(config.OUTPUT_DIR, config.MODEL.NAME + '_{}.pth'.format(epoch))
+            best_acc = val_acc
+            save_path = os.path.join(config.OUTPUT_DIR, config.MODEL.NAME + '_epoch_{}_acc_{}.pth'.format(epoch, best_acc))
             save_network(model, save_path, config.MODEL.DEVICE)
             print(f"Saved model at {save_path}")
 
