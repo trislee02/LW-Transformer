@@ -21,7 +21,7 @@ SOLVER:
   BASE_LR: 0.008
   SEED: 1
   CHECKPOINT_PATH: /content/drive/MyDrive/saved_weights/transformer_checkpoint_epoch_2_acc_0.0342.ckpt
-  RESUME_TRAINING: True
+  RESUME_TRAINING: False
 
 TEST:
   IMS_PER_BATCH: 256
