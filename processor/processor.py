@@ -143,9 +143,9 @@ def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer
 
         val_loss, val_acc = validate(model, val_dataloader, loss_fn, device=device)
 
+        save_checkpoint_path = os.path.join(config.OUTPUT_DIR, config.MODEL.NAME + '_checkpoint_epoch_{}_acc_{:.4f}.ckpt'.format(epoch, best_acc))
         if val_acc > best_acc:
             best_acc = val_acc
-            save_checkpoint_path = os.path.join(config.OUTPUT_DIR, config.MODEL.NAME + '_checkpoint_epoch_{}_acc_{:.4f}.ckpt'.format(epoch, best_acc))
             save_model_path = os.path.join(config.OUTPUT_DIR, config.MODEL.NAME + '_model_epoch_{}_acc_{:.4f}.pth'.format(epoch, best_acc))
             save_checkpoint(model, epoch, optimizer, best_acc, num_unfrozen_blocks-1, save_checkpoint_path, config.MODEL.DEVICE)
             save_model(model, save_model_path, config.MODEL.DEVICE)
