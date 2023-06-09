@@ -20,7 +20,7 @@ SOLVER:
   MAX_EPOCHS: 120
   BASE_LR: 0.008
   SEED: 1
-  CHECKPOINT_PATH: /content/drive/MyDrive/saved_weights/transformer_checkpoint_epoch_2_acc_0.0342.ckpt
+  CHECKPOINT_PATH: /content/drive/MyDrive/saved_weights/transformer_checkpoint_epoch_29_acc_0.1642.ckpt
   RESUME_TRAINING: False
 
 TEST:
