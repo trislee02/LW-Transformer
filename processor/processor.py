@@ -85,8 +85,8 @@ def load_checkpoint(config, model, optimizer, device='cpu'):
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         best_acc = checkpoint['best_acc']
-        epoch = checkpoint['epoch'] + 1
-        num_unfrozen_blocks = checkpoint['num_unfrozen_blocks']
+        last_epoch = checkpoint['epoch']
+        last_num_unfrozen_blocks = checkpoint['num_unfrozen_blocks']
 
         # Move optimizer state to appropriate device
         for state in optimizer.state.values():
@@ -94,7 +94,7 @@ def load_checkpoint(config, model, optimizer, device='cpu'):
                 if isinstance(v, torch.Tensor):
                     state[k] = v.to(device)
         
-        return model, optimizer, best_acc, epoch, num_unfrozen_blocks
+        return model, optimizer, best_acc, last_epoch, last_num_unfrozen_blocks
     
     return None
 
@@ -124,14 +124,18 @@ def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer
 
     checkpoint = load_checkpoint(config, model, optimizer, device=device)
     if checkpoint is not None:
-        model, optimizer, best_acc, epoch, num_unfrozen_blocks = checkpoint
+        model, optimizer, best_acc, last_epoch, last_num_unfrozen_blocks = checkpoint
+        unfreeze_blocks(model, last_num_unfrozen_blocks)
+        epoch = last_epoch + 1
+        num_unfrozen_blocks = last_num_unfrozen_blocks + 1
 
     while epoch < num_epochs:
         if epoch % config.SOLVER.UNFREEZE_BLOCKS == 0:
             unfreeze_blocks(model, num_unfrozen_blocks)
+            print(f'\nUnfroze {num_unfrozen_blocks} blocks')
             num_unfrozen_blocks += 1    
         trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-        print("Unfrozen Blocks: {}, Trainable Params: {}".format(num_unfrozen_blocks - 1, trainable_params))
+        print("\nUnfrozen Blocks: {}, Trainable Params: {}".format(num_unfrozen_blocks - 1, trainable_params))
 
         print(f"\nEpoch {epoch}: ========================")
 
@@ -143,7 +147,7 @@ def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer
             best_acc = val_acc
             save_checkpoint_path = os.path.join(config.OUTPUT_DIR, config.MODEL.NAME + '_checkpoint_epoch_{}_acc_{:.4f}.ckpt'.format(epoch, best_acc))
             save_model_path = os.path.join(config.OUTPUT_DIR, config.MODEL.NAME + '_model_epoch_{}_acc_{:.4f}.pth'.format(epoch, best_acc))
-            save_checkpoint(model, epoch, optimizer, best_acc, num_unfrozen_blocks, save_checkpoint_path, config.MODEL.DEVICE)
+            save_checkpoint(model, epoch, optimizer, best_acc, num_unfrozen_blocks-1, save_checkpoint_path, config.MODEL.DEVICE)
             save_model(model, save_model_path, config.MODEL.DEVICE)
             print(f"Saved model at {save_model_path}")
             print(f"Saved checkpoint at {save_checkpoint_path}")
