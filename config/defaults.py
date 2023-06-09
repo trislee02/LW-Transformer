@@ -68,6 +68,8 @@ _C.SOLVER.UNFREEZE_BLOCKS = 2
 # This is global, so if we have 8 GPUs and IMS_PER_BATCH = 128, each GPU will
 # contain 16 images per batch
 _C.SOLVER.IMS_PER_BATCH = 64
+_C.SOLVER.CHECKPOINT_PATH = ''
+_C.SOLVER.RESUME_TRAINING = False
 # ---------------------------------------------------------------------------- #
 # TEST
 # ---------------------------------------------------------------------------- #

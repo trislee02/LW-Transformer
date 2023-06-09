@@ -67,9 +67,40 @@ def validate(model, val_dataloader, loss_fn, device='cuda'):
 
     return val_loss, val_acc
 
-def save_network(model, path, device='cpu'):
+def save_checkpoint(model, epoch, optimizer, best_acc, num_unfrozen_blocks, path, device='cpu'):
     model.cpu()
-    torch.save(model, path)
+    torch.save({
+        'epoch': epoch,
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'best_acc': best_acc,
+        'num_unfrozen_blocks': num_unfrozen_blocks
+        }, path)
+    model.to(device)  
+
+def load_checkpoint(config, model, optimizer, device='cpu'):
+    checkpoint = torch.load(config.SOLVER.CHECKPOINT_PATH) if config.SOLVER.RESUME_TRAINING else None
+
+    if checkpoint is not None:
+        model.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        best_acc = checkpoint['best_acc']
+        epoch = checkpoint['epoch'] + 1
+        num_unfrozen_blocks = checkpoint['num_unfrozen_blocks']
+
+        # Move optimizer state to appropriate device
+        for state in optimizer.state.values():
+            for k, v in state.items():
+                if isinstance(v, torch.Tensor):
+                    state[k] = v.to(device)
+        
+        return model, optimizer, best_acc, epoch, num_unfrozen_blocks
+    
+    return None
+
+def save_model(model, path, device='cpu'):
+    model.cpu()
+    torch.save(model.state_dict(), path)
     model.to(device)    
 
 def freeze_all_block(model):
@@ -87,15 +118,20 @@ def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer
     num_epochs = config.SOLVER.MAX_EPOCHS
     device = config.MODEL.DEVICE
     best_acc = 0.0
-    
+    epoch = 0
     num_unfrozen_blocks = 0
     freeze_all_block(model)
 
-    for epoch in range(num_epochs):
+    checkpoint = load_checkpoint(config, model, optimizer, device=device)
+    if checkpoint is not None:
+        model, optimizer, best_acc, epoch, num_unfrozen_blocks = checkpoint
+
+    while epoch < num_epochs:
         if epoch % config.SOLVER.UNFREEZE_BLOCKS == 0:
             unfreeze_blocks(model, num_unfrozen_blocks)
-            trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-            print("Unfrozen Blocks: {}, Trainable Params: {}".format(num_unfrozen_blocks, trainable_params))
+            num_unfrozen_blocks += 1    
+        trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+        print("Unfrozen Blocks: {}, Trainable Params: {}".format(num_unfrozen_blocks - 1, trainable_params))
 
         print(f"\nEpoch {epoch}: ========================")
 
@@ -105,8 +141,13 @@ def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer
 
         if val_acc > best_acc:
             best_acc = val_acc
-            save_path = os.path.join(config.OUTPUT_DIR, config.MODEL.NAME + '_epoch_{}_acc_{}.pth'.format(epoch, best_acc))
-            save_network(model, save_path, config.MODEL.DEVICE)
-            print(f"Saved model at {save_path}")
+            save_checkpoint_path = os.path.join(config.OUTPUT_DIR, config.MODEL.NAME + '_checkpoint_epoch_{}_acc_{:.4f}.ckpt'.format(epoch, best_acc))
+            save_model_path = os.path.join(config.OUTPUT_DIR, config.MODEL.NAME + '_model_epoch_{}_acc_{:.4f}.pth'.format(epoch, best_acc))
+            save_checkpoint(model, epoch, optimizer, best_acc, num_unfrozen_blocks, save_checkpoint_path, config.MODEL.DEVICE)
+            save_model(model, save_model_path, config.MODEL.DEVICE)
+            print(f"Saved model at {save_model_path}")
+            print(f"Saved checkpoint at {save_checkpoint_path}")
+
+        epoch += 1
 
         

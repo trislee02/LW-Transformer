@@ -44,7 +44,7 @@ def main(config):
     loss_function = make_loss(config)
 
     optimizer = make_optimizer(config, model)
-
+   
     do_train(config, 
             model=model, 
             train_dataloader=train_loader, 

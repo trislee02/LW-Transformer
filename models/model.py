@@ -61,5 +61,6 @@ def make_model(config, num_classes, feature_only=True):
     base_model = base_model.to(config.MODEL.DEVICE)
     base_model.eval()
     
-    return LWTransformer(base_model, num_classes=num_classes, feature_only=feature_only)
+    model = LWTransformer(base_model, num_classes=num_classes, feature_only=feature_only)
+    return model
 
