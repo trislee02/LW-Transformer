@@ -134,7 +134,7 @@ def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer
         num_unfrozen_blocks = last_num_unfrozen_blocks + 1
 
     while epoch < num_epochs:
-        if epoch % config.SOLVER.UNFREEZE_BLOCKS == 0:
+        if config.SOLVER.BLOCKWISE_FINETUNE and epoch % config.SOLVER.UNFREEZE_BLOCKS == 0:
             frozen = unfreeze_blocks(model, num_unfrozen_blocks)
             if frozen:
                 print(f'\nUnfroze {num_unfrozen_blocks} blocks')

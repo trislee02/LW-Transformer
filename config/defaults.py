@@ -70,6 +70,7 @@ _C.SOLVER.UNFREEZE_BLOCKS = 2
 _C.SOLVER.IMS_PER_BATCH = 64
 _C.SOLVER.CHECKPOINT_PATH = ''
 _C.SOLVER.RESUME_TRAINING = False
+_C.SOLVER.BLOCKWISE_FINETUNE = True
 # ---------------------------------------------------------------------------- #
 # TEST
 # ---------------------------------------------------------------------------- #
