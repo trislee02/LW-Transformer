@@ -25,8 +25,8 @@ class Market1501(BaseImageDataset):
 
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, stratify=y)
 
-        self.train = Dataset(X_train, y_train)
-        self.val = Dataset(X_val, y_val)
+        self.train = [(X_train[i], y_train[i]) for i in range(len(X_train))]
+        self.val = [(X_val[i], y_val[i]) for i in range(len(X_val))]
 
         if verbose:
           print("Train set: {} images".format(len(self.train)))
