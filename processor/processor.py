@@ -191,7 +191,7 @@ def extract_feature(model, dataloaders, device='cpu'):
         n, c, h, w = img.size()
         
         count += n
-        features = torch.cat((features, output), 0)
+        features = torch.cat((features, output[0]), 0)
         idx += 1
     return features
 
