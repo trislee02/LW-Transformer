@@ -104,7 +104,17 @@ def load_checkpoint(config, model, optimizer, device='cpu'):
 def save_model(model, path, device='cpu'):
     model.cpu()
     torch.save(model.state_dict(), path)
-    model.to(device)    
+    model.to(device)
+
+def load_model(model, path, device='cpu'):
+    model.cpu()
+    # Load the model state dictionary from the .pth file
+    checkpoint = torch.load(path)
+    # Load the model weights
+    model.load_state_dict(checkpoint, strict=False)
+    #
+    model.to(device)
+    model.eval()
 
 def freeze_all_block(model):
     for block in model.base_model.blocks:
@@ -165,4 +175,41 @@ def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer
             print(f"Saved model at {save_model_path}")
             print(f"Saved checkpoint at {save_checkpoint_path}")
 
-        epoch += 1        
+        epoch += 1
+
+def extract_feature(model, dataloaders, device='cpu'):    
+    features =  torch.FloatTensor()
+    count = 0
+    idx = 0
+    for data in tqdm(dataloaders):
+        img, label = data
+        img, label = img.to(device), label.to(device)
+
+        output = model(img)
+
+        n, c, h, w = img.size()
+        
+        count += n
+        features = torch.cat((features, output.detach().cpu()), 0)
+        idx += 1
+    return features
+
+def do_test(config, model, model_path, query_loader, gallery_loader):
+    load_model(model, model_path, config.MODEL.DEVICE);
+
+    # Extract Query Features
+    query_features = extract_feature(model, query_loader)
+
+    # Extract Gallery Features
+    gallery_features = extract_feature(model, gallery_loader)
+
+    # Retrieve labels
+    query_labels = query_loader.dataset.labels
+    gallery_labels = gallery_loader.dataset.labels
+
+    print("query_features size: ", query_features.size())
+    print("gallery_features size: ", gallery_features.size())
+    print("query_labels size: ", query_labels.size())
+    print("gallery_labels size: ", gallery_labels.size())
+    print("query_labels size: ", query_labels)
+    print("gallery_labels size: ", gallery_labels)

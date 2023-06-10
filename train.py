@@ -35,7 +35,7 @@ def main(config):
 
     os.environ['CUDA_VISIBLE_DEVICES'] = config.MODEL.DEVICE_ID
 
-    train_loader, val_loader, num_classes = make_dataloader(config)
+    train_loader, val_loader, query_loader, gallery_loader, num_classes = make_dataloader(config)
 
     model = make_model(config, num_classes, feature_only=False)
 
