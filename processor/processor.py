@@ -217,6 +217,8 @@ def do_test(config, model, model_path, query_loader, gallery_loader):
     gallery_ids = gallery_loader.dataset.ids
 
     index = faiss.IndexIDMap(faiss.IndexFlatIP(1536))
+    testa = np.array(gallery_ids);
+    testb = np.array([t.numpy() for t in gallery_features]);
     index.add_with_ids(np.array([t.numpy() for t in gallery_features]),np.array(gallery_ids))
 
     # Do test
