@@ -179,7 +179,6 @@ def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer
 
 def extract_feature(model, dataloaders, device='cpu'):    
     features = torch.FloatTensor()
-    features = features.to(device)
     count = 0
     idx = 0
     for data in tqdm(dataloaders):
@@ -191,7 +190,7 @@ def extract_feature(model, dataloaders, device='cpu'):
         n, c, h, w = img.size()
         
         count += n
-        # features = torch.cat((features, output[0]), 0)
+        features = torch.cat((features, output[0].detach().cpu()), 0)
         idx += 1
     return features
 
