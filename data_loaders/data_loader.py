@@ -35,8 +35,8 @@ def make_dataloader(config):
     train_loader = DataLoader(train_set, batch_size=config.SOLVER.IMS_PER_BATCH, shuffle=True, num_workers=num_workers)
     val_loader = DataLoader(val_set, batch_size=config.SOLVER.IMS_PER_BATCH, shuffle=True, num_workers=num_workers)
     #
-    query_loader = DataLoader(query_set, batch_size=config.SOLVER.IMS_PER_BATCH_QUERY_GALLERY, shuffle=False)
-    gallery_loader = DataLoader(gallery_set, batch_size=config.SOLVER.IMS_PER_BATCH_QUERY_GALLERY, shuffle=False)
+    query_loader = DataLoader(query_set, batch_size=config.TEST.IMS_PER_BATCH, shuffle=False)
+    gallery_loader = DataLoader(gallery_set, batch_size=config.TEST.IMS_PER_BATCH, shuffle=False)
 
     train_num_classes = dataset.train_num_classes
     return train_loader, val_loader, query_loader, gallery_loader, train_num_classes
