@@ -210,8 +210,8 @@ def do_test(config, model, model_path, query_loader, gallery_loader):
 
     print("query_features size: ", query_features.size())
     print("gallery_features size: ", gallery_features.size())
-    print("query_ids size: ", query_ids.size())
-    print("gallery_ids size: ", gallery_ids.size())
+    print("query_ids size: ", len(query_ids))
+    print("gallery_ids size: ", len(gallery_ids))
     print("query_ids size: ", query_ids)
     print("gallery_ids size: ", gallery_ids)
     print("query_features size: ", query_features)
