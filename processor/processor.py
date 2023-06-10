@@ -178,7 +178,8 @@ def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer
         epoch += 1
 
 def extract_feature(model, dataloaders, device='cpu'):    
-    features =  torch.FloatTensor()
+    features = torch.FloatTensor()
+    features = features.to(device)
     count = 0
     idx = 0
     for data in tqdm(dataloaders):
@@ -198,10 +199,10 @@ def do_test(config, model, model_path, query_loader, gallery_loader):
     load_model(model, model_path, config.MODEL.DEVICE);
 
     # Extract Query Features
-    query_features = extract_feature(model, query_loader)
+    query_features = extract_feature(model, query_loader, config.MODEL.DEVICE)
 
     # Extract Gallery Features
-    gallery_features = extract_feature(model, gallery_loader)
+    gallery_features = extract_feature(model, gallery_loader, config.MODEL.DEVICE)
 
     # Retrieve labels
     query_labels = query_loader.dataset.labels
