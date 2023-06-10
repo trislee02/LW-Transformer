@@ -203,15 +203,15 @@ def do_test(config, model, model_path, query_loader, gallery_loader):
     # Extract Gallery Features
     gallery_features = extract_feature(model, gallery_loader, config.MODEL.DEVICE)
 
-    # Retrieve labels
-    query_labels = query_loader.dataset.labels
-    gallery_labels = gallery_loader.dataset.labels
+    # Retrieve ids (Because maybe query label set is not equal to gallery label set)
+    query_ids = query_loader.dataset.ids
+    gallery_ids = gallery_loader.dataset.ids
 
     print("query_features size: ", query_features.size())
     print("gallery_features size: ", gallery_features.size())
-    print("query_labels size: ", query_labels.size())
-    print("gallery_labels size: ", gallery_labels.size())
-    print("query_labels size: ", query_labels)
-    print("gallery_labels size: ", gallery_labels)
+    print("query_ids size: ", query_ids.size())
+    print("gallery_ids size: ", gallery_ids.size())
+    print("query_ids size: ", query_ids)
+    print("gallery_ids size: ", gallery_ids)
     print("query_features size: ", query_features)
     print("gallery_features size: ", gallery_features)
