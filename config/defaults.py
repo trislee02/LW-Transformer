@@ -71,6 +71,9 @@ _C.SOLVER.IMS_PER_BATCH = 64
 _C.SOLVER.CHECKPOINT_PATH = ''
 _C.SOLVER.RESUME_TRAINING = False
 _C.SOLVER.BLOCKWISE_FINETUNE = True
+_C.SOLVER.STEP_LR_SIZE = 1
+_C.SOLVER.GAMMA = 0.7
+_C.SOLVER.LR_DECAY_BLOCK = 0.8
 # ---------------------------------------------------------------------------- #
 # TEST
 # ---------------------------------------------------------------------------- #

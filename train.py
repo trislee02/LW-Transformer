@@ -43,14 +43,16 @@ def main(config):
 
     optimizer = make_optimizer(config, model)
    
+    scheduler = make_scheduler(config)
+
     do_train(config, 
             model=model, 
             train_dataloader=train_loader, 
             val_dataloader=val_loader,
             loss_fn=loss_function, 
-            optimizer=optimizer)
+            optimizer=optimizer,
+            scheduler=scheduler)
                     
-    # scheduler = make_scheduler(config)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='LW-Transformer')
