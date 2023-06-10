@@ -213,3 +213,5 @@ def do_test(config, model, model_path, query_loader, gallery_loader):
     print("gallery_labels size: ", gallery_labels.size())
     print("query_labels size: ", query_labels)
     print("gallery_labels size: ", gallery_labels)
+    print("query_features size: ", query_features)
+    print("gallery_features size: ", gallery_features)
