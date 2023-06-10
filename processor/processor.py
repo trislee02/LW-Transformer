@@ -125,17 +125,21 @@ def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer
     checkpoint = load_checkpoint(config, model, optimizer, device=device)
     if checkpoint is not None:
         model, optimizer, best_acc, last_epoch, last_num_unfrozen_blocks = checkpoint
-        unfreeze_blocks(model, last_num_unfrozen_blocks)
+        # unfreeze_blocks(model, last_num_unfrozen_blocks)
         epoch = last_epoch + 1
-        num_unfrozen_blocks = last_num_unfrozen_blocks + 1
+        # num_unfrozen_blocks = last_num_unfrozen_blocks + 1
+    #
+    num_unfrozen_blocks = 1;
+    unfreeze_blocks(model, num_unfrozen_blocks)
 
     while epoch < num_epochs:
-        if epoch % config.SOLVER.UNFREEZE_BLOCKS == 0:
-            unfreeze_blocks(model, num_unfrozen_blocks)
-            print(f'\nUnfroze {num_unfrozen_blocks} blocks')
-            num_unfrozen_blocks += 1    
+        # if epoch % config.SOLVER.UNFREEZE_BLOCKS == 0:
+            # unfreeze_blocks(model, num_unfrozen_blocks)
+            # print(f'\nUnfroze {num_unfrozen_blocks} blocks')
+            # num_unfrozen_blocks += 1    
         trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-        print("\nUnfrozen Blocks: {}, Trainable Params: {}".format(num_unfrozen_blocks - 1, trainable_params))
+        # print("\nUnfrozen Blocks: {}, Trainable Params: {}".format(num_unfrozen_blocks - 1, trainable_params))
+        print("\nUnfrozen Blocks: {}, Trainable Params: {}".format(num_unfrozen_blocks, trainable_params))
 
         print(f"\nEpoch {epoch}: ========================")
 
@@ -149,7 +153,7 @@ def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer
             save_model_path = os.path.join(config.OUTPUT_DIR, config.MODEL.NAME + '_model_epoch_{}_acc_{:.4f}.pth'.format(epoch, best_acc))
             save_checkpoint(model, epoch, optimizer, best_acc, num_unfrozen_blocks-1, save_checkpoint_path, config.MODEL.DEVICE)
             # save_model(model, save_model_path, config.MODEL.DEVICE)
-            print(f"Saved model at {save_model_path}")
+            # print(f"Saved model at {save_model_path}")
             print(f"Saved checkpoint at {save_checkpoint_path}")
 
         epoch += 1
