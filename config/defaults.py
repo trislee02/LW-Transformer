@@ -83,6 +83,7 @@ _C.TEST.IMS_PER_BATCH = 128
 # ---------------------------------------------------------------------------- #
 # Path to checkpoint and saved log of trained model
 _C.OUTPUT_DIR = ""
+_C.SAVED_MODEL = True
 
 def get_cfg_defaults():
   """Get a yacs CfgNode object with default values."""

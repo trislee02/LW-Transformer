@@ -155,7 +155,8 @@ def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer
             best_acc = val_acc
             save_model_path = os.path.join(config.OUTPUT_DIR, config.MODEL.NAME + '_model_epoch_{}_acc_{:.4f}.pth'.format(epoch, best_acc))
             save_checkpoint(model, epoch, optimizer, best_acc, num_unfrozen_blocks-1, save_checkpoint_path, config.MODEL.DEVICE)
-            save_model(model, save_model_path, config.MODEL.DEVICE)
+            if config.SAVED_MODEL:
+                save_model(model, save_model_path, config.MODEL.DEVICE)
             print(f"Saved model at {save_model_path}")
             print(f"Saved checkpoint at {save_checkpoint_path}")
 
