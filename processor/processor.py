@@ -217,9 +217,9 @@ def do_test(config, model, model_path, query_loader, gallery_loader):
     gallery_ids = gallery_loader.dataset.ids
 
     index = faiss.IndexIDMap(faiss.IndexFlatIP(1536))
-    testa = np.array(gallery_ids);
-    testb = np.array([t.numpy() for t in gallery_features]);
-    index.add_with_ids(np.array([t.numpy() for t in gallery_features]),np.array(gallery_ids))
+    gallery_ids_nparr = np.array(int(i) for i in gallery_ids);
+    gallery_features_nparr = np.array([t.numpy() for t in gallery_features]);
+    index.add_with_ids(gallery_features_nparr, gallery_ids_nparr)
 
     # Do test
     rank1_score = 0
