@@ -140,7 +140,9 @@ def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer
                 print(f'\nUnfroze {num_unfrozen_blocks} blocks')
                 num_unfrozen_blocks += 1    
         trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-        print("\nUnfrozen Blocks: {}, Trainable Params: {}".format(num_unfrozen_blocks - 1, trainable_params))
+        if num_unfrozen_blocks > 0:
+            print("\nUnfrozen Blocks: {}, Trainable Params: {}".format(num_unfrozen_blocks - 1, trainable_params))
+        else:  print("\nTrainable Params: {}".format(trainable_params))
 
         print(f"\nEpoch {epoch}: ========================")
 
