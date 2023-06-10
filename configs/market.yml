@@ -26,4 +26,4 @@ SOLVER:
 TEST:
   IMS_PER_BATCH: 256
 
-OUTPUT_DIR: '/kaggle/working/saved_weights'
+OUTPUT_DIR: '/kaggle/working/LW-Transformer/saved_weights'
