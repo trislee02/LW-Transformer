@@ -10,8 +10,6 @@ from models import make_model
 from loss import make_loss
 from optimizers import make_optimizer
 from schedulers import make_scheduler
-
-# Debug only
 from processor import do_train
 
 def set_seed(seed):
@@ -58,11 +56,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='LW-Transformer')
     parser.add_argument('-c', '--config', default=None, type=str,
                 help="config file path (default: None)")
+    parser.add_argument('opts', help='Modify config options using the command-line', default=None,
+                nargs=argparse.REMAINDER)
     args = parser.parse_args()
 
     config = get_cfg_defaults()
     if args.config != "":
         config.merge_from_file(args.config)
+    config.merge_from_list(args.opts)
     config.freeze()
     
     main(config)
