@@ -213,11 +213,11 @@ def do_test(config, model, model_path, query_loader, gallery_loader):
     gallery_features = extract_feature(model, gallery_loader, config.MODEL.DEVICE)
 
     # Retrieve ids (Because maybe query label set is not equal to gallery label set)
-    query_ids = query_loader.dataset.ids
-    gallery_ids = gallery_loader.dataset.ids
+    query_ids = [int(i) for i in query_loader.dataset.ids]
+    gallery_ids = [int(i) for i in gallery_loader.dataset.ids]
 
     index = faiss.IndexIDMap(faiss.IndexFlatIP(1536))
-    gallery_ids_nparr = np.array([int(i) for i in gallery_ids]);
+    gallery_ids_nparr = np.array(gallery_ids);
     gallery_features_nparr = np.array([t.numpy() for t in gallery_features]);
     index.add_with_ids(gallery_features_nparr, gallery_ids_nparr)
 
