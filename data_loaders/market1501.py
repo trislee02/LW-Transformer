@@ -1,8 +1,11 @@
 import os.path
 import glob
 import torch
-from torch.utils.data import random_split
+import numpy as np
+from torch.utils.data import Dataset
+from sklearn.model_selection import train_test_split
 from .bases import BaseImageDataset
+
 
 class Market1501(BaseImageDataset):
 
@@ -17,10 +20,13 @@ class Market1501(BaseImageDataset):
         self.query, self.query_labels, self.query_num_classes = self.__process_dir(self.query_dir)
         self.gallery, self.gallery_labels, self.gallery_num_classes = self.__process_dir(self.gallery_dir)
 
-        generator2 = torch.Generator().manual_seed(42)
-        data = random_split(self.train, [0.7, 0.3], generator=generator2)
-        self.train = data[0]
-        self.val = data[1]
+        X = np.array([data[0] for data in self.train])
+        y = np.array([data[1] for data in self.train])
+
+        X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, stratify=y)
+
+        self.train = Dataset(X_train, y_train)
+        self.val = Dataset(X_val, y_val)
 
         if verbose:
           print("Train set: {} images".format(len(self.train)))

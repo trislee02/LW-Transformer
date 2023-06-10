@@ -110,9 +110,13 @@ def freeze_all_block(model):
 
 def unfreeze_blocks(model, num_blocks):
     block_from = model.num_blocks - num_blocks
-    for block in model.base_model.blocks[block_from:]:
-        for param in block.parameters():
-            param.requires_grad = True
+    if block_from >= 0:
+        for block in model.base_model.blocks[block_from:]:
+            for param in block.parameters():
+                param.requires_grad = True
+        return True
+    else:
+        return False
 
 def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer):
     num_epochs = config.SOLVER.MAX_EPOCHS
@@ -131,9 +135,10 @@ def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer
 
     while epoch < num_epochs:
         if epoch % config.SOLVER.UNFREEZE_BLOCKS == 0:
-            unfreeze_blocks(model, num_unfrozen_blocks)
-            print(f'\nUnfroze {num_unfrozen_blocks} blocks')
-            num_unfrozen_blocks += 1    
+            frozen = unfreeze_blocks(model, num_unfrozen_blocks)
+            if frozen:
+                print(f'\nUnfroze {num_unfrozen_blocks} blocks')
+                num_unfrozen_blocks += 1    
         trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
         print("\nUnfrozen Blocks: {}, Trainable Params: {}".format(num_unfrozen_blocks - 1, trainable_params))
 
@@ -152,6 +157,4 @@ def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer
             print(f"Saved model at {save_model_path}")
             print(f"Saved checkpoint at {save_checkpoint_path}")
 
-        epoch += 1
-
-        
+        epoch += 1        
