@@ -1,6 +1,9 @@
 import torch
 import os
 from tqdm import tqdm
+import faiss
+import numpy as np
+from metrics import calc_map, rank1, rank5, rank10
 
 def train_one_epoch(model, train_dataloader, loss_fn, optimizer, scheduler, device='cuda'):
     # Training
@@ -195,6 +198,11 @@ def extract_feature(model, dataloaders, device='cpu'):
         idx += 1
     return features
 
+def do_faiss_index_search(index, query, k=1):
+    encoded_query = query.unsqueeze(dim=0).numpy()
+    top_k = index.search(encoded_query, k)
+    return top_k
+
 def do_test(config, model, model_path, query_loader, gallery_loader):
     load_model(model, model_path, config.MODEL.DEVICE);
 
@@ -208,11 +216,27 @@ def do_test(config, model, model_path, query_loader, gallery_loader):
     query_ids = query_loader.dataset.ids
     gallery_ids = gallery_loader.dataset.ids
 
-    print("query_features size: ", query_features.size())
-    print("gallery_features size: ", gallery_features.size())
-    print("query_ids size: ", len(query_ids))
-    print("gallery_ids size: ", len(gallery_ids))
-    print("query_ids size: ", query_ids)
-    print("gallery_ids size: ", gallery_ids)
-    print("query_features size: ", query_features)
-    print("gallery_features size: ", gallery_features)
+    index = faiss.IndexIDMap(faiss.IndexFlatIP(1536))
+    index.add_with_ids(np.array([t.numpy() for t in gallery_features]),np.array(gallery_ids))
+
+    # Do test
+    rank1_score = 0
+    rank5_score = 0
+    rank10_score = 0
+    ap = 0
+    count = 0
+    for query, id in zip(query_features, query_ids):
+        count += 1
+        output = do_faiss_index_search(index, query, k=10)
+        # print(output)
+        rank1_score += rank1(id, output) 
+        rank5_score += rank5(id, output) 
+        rank10_score += rank10(id, output) 
+        print("Correct: {}, Total: {}, Incorrect: {}".format(rank1_score, count, count-rank1_score), end="\r")
+        ap += calc_map(id, output)
+
+    query_len = query_features.size(0);
+    print("Final Result:")
+    print("Rank1: {}, Rank5: {}, Rank10: {}, mAP: {}".format(rank1_score/query_len, 
+                                                            rank5_score/query_len, 
+                                                            rank10_score/query_len, ap/query_len))

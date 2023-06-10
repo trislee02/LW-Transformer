@@ -1,3 +1,4 @@
 PyYAML==6.0
 yacs==0.1.8
 timm
+faiss-gpu
