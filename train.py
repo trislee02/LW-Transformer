@@ -43,7 +43,7 @@ def main(config):
 
     optimizer = make_optimizer(config, model)
    
-    scheduler = make_scheduler(config)
+    scheduler = make_scheduler(config, optimizer)
 
     do_train(config, 
             model=model, 
