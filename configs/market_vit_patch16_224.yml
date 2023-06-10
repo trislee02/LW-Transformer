@@ -1,0 +1,36 @@
+MODEL:
+  NAME: transformer
+  DEVICE_ID: ('0')
+  DEVICE: 'cuda'
+  PRETRAIN_PATH: ./pretrain/abc.pth
+  BASE_MODEL: vit_base_patch16_224
+
+INPUT:
+  SIZE_TRAIN: [224, 224]
+  SIZE_TEST: [224, 224]
+
+DATASETS:
+  NAMES: market1501
+  ROOT_DIR: ./data
+
+DATALOADER:
+  NUM_WORKERS: 2
+
+SOLVER:
+  OPTIMIZER_NAME: 'ADAM'
+  MAX_EPOCHS: 100
+  BASE_LR: 0.0003
+  SEED: 1
+  WEIGHT_DECAY: 0.0005
+  CHECKPOINT_PATH: /content/drive/MyDrive/saved_weights/transformer_checkpoint_epoch_2_acc_0.0342.ckpt
+  RESUME_TRAINING: False
+  BLOCKWISE_FINETUNE: True
+  STEP_LR_SIZE: 1
+  GAMMA: 0.7
+  LR_DECAY_BLOCK: 0.8
+  IMS_PER_BATCH: 32
+
+TEST:
+  IMS_PER_BATCH: 256
+
+OUTPUT_DIR: '/content/drive/MyDrive/saved_weights'
