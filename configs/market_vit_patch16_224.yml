@@ -2,7 +2,8 @@ MODEL:
   NAME: transformer
   DEVICE_ID: ('0')
   DEVICE: 'cuda'
-  PRETRAIN_PATH: ./pretrain/abc.ptk
+  PRETRAIN_PATH: ./pretrain/abc.pth
+  BASE_MODEL: vit_base_patch16_224
 
 INPUT:
   SIZE_TRAIN: [224, 224]
