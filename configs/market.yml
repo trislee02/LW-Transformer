@@ -20,10 +20,10 @@ SOLVER:
   MAX_EPOCHS: 120
   BASE_LR: 0.008
   SEED: 1
-  CHECKPOINT_PATH: /content/drive/MyDrive/last/transformer_checkpoint_epoch_29_acc_0.1642.ckpt
-  RESUME_TRAINING: True
+  CHECKPOINT_PATH: /kaggle/input/myckpt/transformer_checkpoint_epoch_29_acc_0.1642.ckpt
+  RESUME_TRAINING: False
 
 TEST:
   IMS_PER_BATCH: 256
 
-OUTPUT_DIR: '/content/drive/MyDrive/saved_weights'
+OUTPUT_DIR: '/kaggle/working/saved_weights'
