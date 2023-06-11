@@ -26,11 +26,11 @@ def make_dataloader(config):
 
     dataset = __factory[config.DATASETS.NAMES](root = config.DATASETS.ROOT_DIR)
 
-    train_set = ImageDataset(dataset.train, train_transform)
-    val_set = ImageDataset(dataset.val, val_transform)
+    train_set = ImageDataset(dataset.train, train_transform, dataset.train_labels)
+    val_set = ImageDataset(dataset.val, val_transform, dataset.train_labels)
     #
-    query_set = ImageDataset(dataset.query, val_transform)
-    gallery_set = ImageDataset(dataset.gallery, val_transform)
+    query_set = ImageDataset(dataset.query, val_transform, dataset.query_labels)
+    gallery_set = ImageDataset(dataset.gallery, val_transform, dataset.gallery_labels)
 
     train_loader = DataLoader(train_set, batch_size=config.SOLVER.IMS_PER_BATCH, shuffle=True, num_workers=num_workers)
     val_loader = DataLoader(val_set, batch_size=config.SOLVER.IMS_PER_BATCH, shuffle=True, num_workers=num_workers)
