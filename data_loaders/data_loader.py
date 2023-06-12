@@ -2,10 +2,12 @@ import torchvision.transforms as T
 
 from torch.utils.data import DataLoader
 from .market1501 import Market1501
+from .msmt17 import MSMT17
 from .bases import ImageDataset
 
 __factory = {
-    'market1501': Market1501
+    'market1501': Market1501,
+    'msmt17': MSMT17
 }
 
 def make_dataloader(config):
