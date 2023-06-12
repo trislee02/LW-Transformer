@@ -2,8 +2,7 @@ import os.path
 import glob
 import torch
 import numpy as np
-from torch.utils.data import Dataset
-from sklearn.model_selection import train_test_split
+from PIL import Image
 from .bases import BaseImageDataset
 
 
@@ -38,7 +37,9 @@ class MSMT17(BaseImageDataset):
             for line in lines:
                 path = os.path.join(image_dir, line.strip().split(' ')[0])
                 id = int(line.strip().split(' ')[1])
-                dataset.append((path, id))
+                image = Image.open(path)
+
+                dataset.append((image, id))
                 label_ids[id] = str(id)
 
         return dataset, label_ids, len(label_ids)

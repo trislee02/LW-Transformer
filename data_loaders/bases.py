@@ -1,4 +1,3 @@
-from PIL import Image
 from torch.utils.data import Dataset
 
 class BaseImageDataset:
@@ -31,9 +30,8 @@ class ImageDataset(Dataset):
         return len(self.dataset)
 
     def __getitem__(self, index):
-        image_path, label = self.dataset[index]
+        image, label = self.dataset[index]
 
-        image = Image.open(image_path)
         if self.transform is not None:
             image = self.transform(image)
 

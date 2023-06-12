@@ -2,6 +2,7 @@ import os.path
 import glob
 import torch
 import numpy as np
+from PIL import Image
 from torch.utils.data import Dataset
 from sklearn.model_selection import train_test_split
 from .bases import BaseImageDataset
@@ -49,6 +50,8 @@ class Market1501(BaseImageDataset):
                 label_ids[max_class] = id
                 max_class += 1
 
-            dataset.append((path, id_labels[id]))
+            image = Image.open(path)
+
+            dataset.append((image, id_labels[id]))
 
         return dataset, label_ids, max_class
