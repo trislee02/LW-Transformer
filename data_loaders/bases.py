@@ -33,6 +33,7 @@ class ImageDataset(Dataset):
         image, label = self.dataset[index]
 
         if self.transform is not None:
-            image = self.transform(image)
+            transformed_image = self.transform(image)
+            return transformed_image, label
 
         return image, label
