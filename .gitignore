@@ -166,3 +166,5 @@ data/
 checkpoint/
 
 pretrained/
+
+unit-test/

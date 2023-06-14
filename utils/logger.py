@@ -1,5 +1,7 @@
 import sys
 import logging
+import os
+
 
 def setup_logger(name: str, level = logging.DEBUG):
     logger = logging.getLogger(name)
@@ -12,3 +14,11 @@ def setup_logger(name: str, level = logging.DEBUG):
     logger.addHandler(ch)
 
     return logger
+
+def update_summary(epoch, train_acc, train_loss, val_acc, val_loss, filename, dir, header=True):
+    if filename:
+        filename = os.path.join(dir, filename)
+        with open(filename, 'a') as f:
+            if header and f.tell() == 0:
+                f.write('Epoch,train_acc,train_loss,val_acc,val_loss\n')
+            f.write(f'{epoch},{train_acc},{train_loss},{val_acc},{val_loss}\n')
