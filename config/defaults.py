@@ -63,7 +63,7 @@ _C.SOLVER.MAX_EPOCHS = 100
 _C.SOLVER.BASE_LR = 3e-4
 _C.SOLVER.SEED = 1
 _C.SOLVER.WEIGHT_DECAY = 5e-4
-_C.SOLVER.MOMENTUM = 0
+_C.SOLVER.MOMENTUM = 0.0
 _C.SOLVER.UNFREEZE_BLOCKS = 2
 # Number of images per batch
 # This is global, so if we have 8 GPUs and IMS_PER_BATCH = 128, each GPU will
