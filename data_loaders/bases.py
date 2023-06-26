@@ -1,4 +1,6 @@
 from torch.utils.data import Dataset
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 class BaseImageDataset:
     def __init__(self):
