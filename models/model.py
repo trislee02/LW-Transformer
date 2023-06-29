@@ -3,18 +3,46 @@ from torch import nn
 
 import timm
 
+def weights_init_kaiming(m):
+    classname = m.__class__.__name__
+    if classname.find('Linear') != -1:
+        nn.init.kaiming_normal_(m.weight, a=0, mode='fan_out')
+        nn.init.constant_(m.bias, 0.0)
+    elif classname.find('BatchNorm1d') != -1:
+        nn.init.normal_(m.weight.data, 1.0, 0.02)
+        nn.init.constant_(m.bias.data, 0.0)
+
+def weights_init_classifier(m):
+    classname = m.__class__.__name__
+    if classname.find('Linear') != -1:
+        nn.init.normal_(m.weight.data, std=0.001)
+        nn.init.constant_(m.bias.data, 0.0)
+
 class ClassifierBlock(nn.Module):
-    def __init__(self, input_size, hidden_size, num_classes, p_dropout=0.2):
+    def __init__(self, input_size, hidden_size, num_classes, p_dropout=0.2, bnorm=True, relu=True):
         super().__init__()
-        self.classifier = nn.Sequential(
-            nn.Linear(in_features=input_size, out_features=hidden_size),
-            nn.BatchNorm1d(hidden_size),
-            nn.ReLU(),
-            nn.Dropout(p=p_dropout),
-            nn.Linear(in_features=hidden_size, out_features=num_classes)            
-        )
+        add_block = []
+        add_block += [nn.Linear(in_features=input_size, out_features=hidden_size)]
+        if bnorm:
+            add_block += [nn.BatchNorm1d(hidden_size)]
+        if relu:
+            add_block += [nn.ReLU()]
+        if p_dropout > 0:
+            add_block += [nn.Dropout(p=p_dropout)]
+        
+        add_block = nn.Sequential(*add_block)
+        add_block.apply(weights_init_kaiming)
+
+        classifier = []
+        classifier += [nn.Linear(in_features=hidden_size, out_features=num_classes)]
+        classifier = nn.Sequential(*classifier)
+        classifier.apply(weights_init_classifier)
+
+        self.add_block = add_block
+        self.classifier = classifier
     
     def forward(self, x):
+        x = self.add_block(x)
         return self.classifier(x)
 
 class LWTransformer(nn.Module):
