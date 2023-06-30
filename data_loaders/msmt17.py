@@ -37,9 +37,9 @@ class MSMT17(BaseImageDataset):
             for line in lines:
                 path = os.path.join(image_dir, line.strip().split(' ')[0])
                 id = int(line.strip().split(' ')[1])
-                image = Image.open(path)
+                # image = Image.open(path)
 
-                dataset.append((image, id))
+                dataset.append((path, id))
                 label_ids[id] = str(id)
 
         return dataset, label_ids, len(label_ids)

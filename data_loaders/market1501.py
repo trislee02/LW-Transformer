@@ -50,8 +50,8 @@ class Market1501(BaseImageDataset):
                 label_ids[max_class] = id
                 max_class += 1
 
-            image = Image.open(path)
+            # image = Image.open(path)
 
-            dataset.append((image, id_labels[id]))
+            dataset.append((path, id_labels[id]))
 
         return dataset, label_ids, max_class

@@ -1,6 +1,5 @@
 from torch.utils.data import Dataset
-from PIL import ImageFile
-ImageFile.LOAD_TRUNCATED_IMAGES = True
+from PIL import Image
 
 class BaseImageDataset:
     def __init__(self):
@@ -32,7 +31,8 @@ class ImageDataset(Dataset):
         return len(self.dataset)
 
     def __getitem__(self, index):
-        image, label = self.dataset[index]
+        path, label = self.dataset[index]
+        image = Image.open(path)
 
         if self.transform is not None:
             transformed_image = self.transform(image)
