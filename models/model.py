@@ -44,9 +44,9 @@ class ClassifierBlock(nn.Module):
     def forward(self, x):
         x = self.add_block(x)
         return self.classifier(x)
-
+# feature_type: gl/g/l <=> global and local/global only/local only
 class LWTransformer(nn.Module):
-    def __init__(self, base_model, num_classes, classifier_dropout=0.2, feature_only=True):
+    def __init__(self, base_model, num_classes, classifier_dropout=0.2, feature_only=True, feature_type='gl'):
         super().__init__()
         self.num_classes = num_classes
         self.base_model = base_model
@@ -55,6 +55,7 @@ class LWTransformer(nn.Module):
         self.linear = nn.Linear(in_features=768, out_features=768)
         self.classifier = ClassifierBlock(input_size=1536, hidden_size=1536, num_classes=num_classes, p_dropout=classifier_dropout) # 768 + 768 = 1536 (= concat aggregated token and global token)
         self.feature_only = feature_only
+        self.feature_type = feature_type
 
     def forward(self, x):
         # Divide input image into patch embeddings 
@@ -75,7 +76,13 @@ class LWTransformer(nn.Module):
         local_tokens = x[:,1:]
         local_tokens = self.linear(local_tokens)
         aggregated_token = torch.sum(local_tokens, dim=1)
-        feature = torch.cat((aggregated_token, cls_token_out), dim=1)
+
+        if self.feature_type == 'l':
+            feature = aggregated_token
+        elif self.feature_type == 'g':
+            feature = cls_token_out
+        else:
+            feature = torch.cat((aggregated_token, cls_token_out), dim=1)
         
         if not self.feature_only:
             x = self.classifier(feature)
@@ -83,11 +90,11 @@ class LWTransformer(nn.Module):
         else:
             return feature
 
-def make_model(config, num_classes, feature_only=True):
+def make_model(config, num_classes, feature_only=True, feature_type='gl'):
     base_model = timm.create_model(config.MODEL.BASE_MODEL, pretrained=True)
     base_model = base_model.to(config.MODEL.DEVICE)
     base_model.eval()
     
-    model = LWTransformer(base_model, num_classes=num_classes, feature_only=feature_only, classifier_dropout=config.MODEL.DROPOUT)
+    model = LWTransformer(base_model, num_classes=num_classes, feature_only=feature_only, classifier_dropout=config.MODEL.DROPOUT, feature_type=feature_type)
     return model
 
