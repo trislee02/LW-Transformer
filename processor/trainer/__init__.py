@@ -1,0 +1,2 @@
+from softmax_loss_trainer import SoftmaxLossTrainer
+from triplet_loss_trainer import TripletLossTrainer

@@ -6,76 +6,13 @@ import numpy as np
 from metrics import calc_map, rank1, rank5, rank10
 from utils import save_checkpoint, load_checkpoint, save_model, load_model
 from utils import update_summary
+from trainer import SoftmaxLossTrainer, TripletLossTrainer
 
-def train_one_epoch(model, train_dataloader, loss_fn, optimizer, scheduler, device='cuda'):
-    # Training
-    model.train()
-    model.to(device)
-    epoch_loss = 0.0
-    epoch_acc = 0.0
-
-    for data, target in tqdm(train_dataloader):
-        data, target = data.to(device), target.to(device)
-
-        # 1. Forward pass
-        feature, preds = model(data)
-
-        # 2. Calculate loss
-        loss = loss_fn(preds, target)
-        epoch_loss += loss
-
-        # 3. Refresh optimizer
-        optimizer.zero_grad()
-
-        # 4. Loss backward
-        loss.backward()
-
-        # 5. Optimizer step
-        optimizer.step()
-
-        # Calculate accuracy
-        preds = torch.argmax(preds, dim=1)
-        acc = torch.eq(preds, target).sum().item() / len(target)
-        epoch_acc += acc
-
-    # Update learning rate
-    scheduler.step()
-
-    epoch_loss /= len(train_dataloader)
-    epoch_acc /= len(train_dataloader)
-    
-    print(f"\nTrain loss: {epoch_loss:.5f} - Train acc: {epoch_acc:.5f}")
-
-    return epoch_loss, epoch_acc
-
-def validate(model, val_dataloader, loss_fn, device='cuda'):
-    model.eval()
-    model.to(device)
-    val_loss = 0.0
-    val_acc = 0.0
-
-    with torch.inference_mode():
-        for data, target in tqdm(val_dataloader):
-            data, target = data.to(device), target.to(device)
-
-            # 1. Forward pass
-            feature, preds = model(data)
-
-            # 2. Calculate loss
-            loss = loss_fn(preds, target)
-            val_loss += loss
-
-            # 3. Calculate accuracy
-            preds = torch.argmax(preds, dim=1)
-            acc = torch.eq(preds, target).sum().item() / len(target)
-            val_acc += acc
-
-        val_loss /= len(val_dataloader)
-        val_acc /= len(val_dataloader)
-
-    print(f"\nVal loss: {val_loss:.5f} - Val acc: {val_acc:.5f}")
-
-    return val_loss, val_acc
+def make_trainer(config):
+    if config.MODEL.LOSS == 'SOFTMAX_LOSS':
+        return SoftmaxLossTrainer()
+    elif config.MODEL.LOSS == 'TRIPLET_LOSS':
+        return TripletLossTrainer()
 
 def freeze_all_block(model):
     for block in model.base_model.blocks:
@@ -99,6 +36,7 @@ def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer
     epoch = 0
     num_unfrozen_blocks = 0
     freeze_all_block(model)
+    trainer = make_trainer(config)
 
     checkpoint = load_checkpoint(config, model, optimizer, device=device)
     if checkpoint is not None:
@@ -122,9 +60,9 @@ def do_train(config, model, train_dataloader, val_dataloader, loss_fn, optimizer
 
         print(f"\nEpoch {epoch}: ========================")
 
-        train_loss, train_acc = train_one_epoch(model, train_dataloader, loss_fn, optimizer, scheduler, device=device)
+        train_loss, train_acc = trainer.train_one_epoch(model, train_dataloader, loss_fn, optimizer, scheduler, device=device)
 
-        val_loss, val_acc = validate(model, val_dataloader, loss_fn, device=device)
+        val_loss, val_acc = trainer.validate(model, val_dataloader, loss_fn, device=device)
 
         save_checkpoint_path = os.path.join(config.OUTPUT_DIR, config.MODEL.NAME + '_checkpoint_epoch_{}_acc_{:.4f}.ckpt'.format(epoch, val_acc))
         save_checkpoint(model, epoch, optimizer, best_acc, num_unfrozen_blocks-1, save_checkpoint_path, config.MODEL.DEVICE)

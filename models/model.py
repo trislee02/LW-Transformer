@@ -88,6 +88,9 @@ def make_model(config, num_classes, feature_only=True):
     base_model = base_model.to(config.MODEL.DEVICE)
     base_model.eval()
     
-    model = LWTransformer(base_model, num_classes=num_classes, feature_only=feature_only, classifier_dropout=config.MODEL.DROPOUT)
+    if config.MODEL.LOSS == 'SOFTMAX_LOSS':
+        model = LWTransformer(base_model, num_classes=num_classes, feature_only=feature_only, classifier_dropout=config.MODEL.DROPOUT)
+    elif config.MODEL.LOSS == 'TRIPLET_LOSS':
+        model = LWTransformer(base_model, num_classes=num_classes, feature_only=True, classifier_dropout=config.MODEL.DROPOUT)
     return model
 
